@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Editor {
 
@@ -28,54 +26,61 @@ public class Editor {
         }
     }
 
-    public void changeText() {
-        String[] words;
-        String buffer;
-        StringBuilder sb;
-        char[] divs;
-        int pos = 0;
 
-        for (int i = 0; i < text.size(); i++) {
+    public void chText() {
 
-            buffer = text.get(i);
-            words = buffer.split("\\s|\\.|\\,");
-            int wSize = words.length;
-            divs = new char[wSize + 1];
+        StringTokenizer st;
+        List<String> words;
+        List<Integer> positions;
+        List<Integer> invPosit;
+        String buf;
+        StringBuffer sb;
+        int remPos = 1;
 
-            for (int j = 0; j < buffer.length(); j++) {
-                if (buffer.charAt(j) == ' ' || buffer.charAt(j) == '.' || buffer.charAt(j) == ',') {
-                    divs[pos] = buffer.charAt(j);
-                    pos++;
+        for (String row : text) {
+
+            st = new StringTokenizer(row, " .,", true);
+            words = new ArrayList<>();
+            positions = new ArrayList<>();
+
+            while(st.hasMoreTokens()){
+                words.add(st.nextToken());
+            }
+
+            for(String word : words){
+                if(!word.equals(" ") && !word.equals(",") && !word.equals(".")){
+                    positions.add(words.indexOf(word));
                 }
             }
 
-            for (int j = 0; j < wSize / 2; j++) {
-                buffer = words[j];
-                words[j] = words[wSize - j - 1];
-                words[wSize - j - 1] = buffer;
+            invPosit = new ArrayList<>(positions);
+            Collections.reverse(invPosit);
+
+            for(int i = 0; i < positions.size() / 2; i++){
+
+                buf = words.get((int)invPosit.get(i));
+                words.add(invPosit.get(i), words.get((int)positions.get(i)));
+                words.add(positions.get(i), buf);
+
+                words.remove(positions.get(i) + remPos);
+                words.remove(invPosit.get(i) + remPos);
+
             }
 
-            sb = new StringBuilder();
+            sb = new StringBuffer();
 
-            if (pos == wSize) {
-                for (int j = 0; j < wSize; j++) {
-                    sb.append(words[j]).append(divs[divs.length - 1 - pos]);
-                    pos--;
-                }
-            }
-            else {
-                for (int j = 0; j < wSize - 1; j++) {
-                    sb.append(words[j]).append(divs[divs.length - 1 - pos]);
-                    pos--;
-                }
-                sb.append(words[wSize - 1]);
+            for(String word : words){
+                sb.append(word);
             }
             changedText.add(sb.toString());
+
         }
+
     }
 
-    public void printInvertedText(){
-        for(int i = 0; i < changedText.size(); i++){
+
+    public void printInvertedText() {
+        for (int i = 0; i < changedText.size(); i++) {
             System.out.println(changedText.get(i));
         }
     }
